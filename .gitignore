@@ -313,8 +313,3 @@ TSWLatexianTemp*
 
 # End of https://www.toptal.com/developers/gitignore/api/latex
 
-# Ignore everything in the data folder
-data/*
-
-# But do not ignore the folder itself
-!data/
