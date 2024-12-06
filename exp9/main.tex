@@ -32,7 +32,7 @@
 % タイトル
 \maketitle
 
-\section{観測結果と考察}
+\section{課題1}
 \subsection{観測場所}
 観測は2号館12階の教室で実施した.
 
@@ -63,30 +63,13 @@
     \caption{NHK信号のスペクトラム}
     \label{fig:nhk_spectrum}
 \end{figure}
-\begin{enumerate}
-    \item グラフの中心周波数と横幅：
-    \begin{itemize}
-        \item \textbf{中心周波数：} 0 Hz（ベースバンド表示）
-        \item \textbf{横幅：} \(\pm f_s/2\)（標本化周波数 \(f_s\) に依存）
-    \end{itemize}
-    \item 実際の信号とスペクトルの対応：
-    \begin{itemize}
-        \item 見えているスペクトルはUSRPによってキャリア周波数 \(f_c\) が除去されたもの。
-        \item スペクトルを \(f_c\) 平行移動すれば元の信号スペクトルに一致する。
-    \end{itemize}
-    \item 理論的背景：
-    \begin{itemize}
-        \item ナイキスト周波数：標本化定理に基づき、スペクトルは \(-f_s/2 \sim f_s/2\) に制限される。
-        \item フーリエ変換の周波数シフト性：
-        \[
-        \mathcal{F}\{x(t) e^{-j2\pi f_c t}\}(f) = X(f + f_c)
-        \]
-        これにより平行移動が可能。
-    \end{itemize}
-\end{enumerate}
 
 
-\section{課題2}
+\section*{課題2: FM送受信機の実装}
+
+\subsection*{考察事項}
+FM変復調器の原理を数式とブロックダイアグラムを用いて説明する。
+
 \subsection*{FM変調の原理}
 FM変調は、音声信号 \(m(t)\) を用いて搬送波の周波数を変化させる方式である。送信信号は以下で表される：
 \[
@@ -114,17 +97,6 @@ f_{\text{inst}}(t) = \frac{1}{2 \pi} \frac{d}{dt} \arg \left( s_{IQ}(t) \right)
 \subsection*{ブロックダイアグラムとの対応}
 以下に、FM送受信機のブロックダイアグラムを示す。
 
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.8\linewidth]{diagram1.png}
-    \caption{FM送信機ブロック図}
-\end{figure}
-
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.8\linewidth]{diagram2.png}
-    \caption{FM受信機ブロック図}
-\end{figure}
 
 \subsection*{受信についての考察}
 \begin{itemize}
@@ -145,23 +117,6 @@ f_{\text{inst}}(t) = \frac{1}{2 \pi} \frac{d}{dt} \arg \left( s_{IQ}(t) \right)
 \subsection*{FMの音質が良い理由}
 FMでは振幅成分が一定で、ノイズが加わっても信号の周波数変化に影響を与えにくいため、AMより音質が良い。また、FMは広い帯域幅を利用できるため、高周波成分を含む信号を忠実に再現できる。
 
-% セクション4: 考察
-\section{考察}
-今回の実験結果から、以下のことが分かった。
-\begin{itemize}
-    \item 測定値は理論値とほぼ一致していた。
-    \item 誤差の原因として、接触抵抗の影響が考えられる。
-\end{itemize}
 
-% セクション5: 結論
-\section{結論}
-今回の実験を通して、○○の物理特性について深く理解することができた。
-
-% 参考文献
-\section*{参考文献}
-\begin{enumerate}
-    \item 著者名, 「タイトル」, 出版社, 出版年.
-    \item John Doe, "Physics for Engineers", Springer, 2020.
-\end{enumerate}
 
 \end{document}
