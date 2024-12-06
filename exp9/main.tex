@@ -1,8 +1,8 @@
 \documentclass[a4paper, twocolumn]{article} % A4用紙, 二段組
 \usepackage[utf8]{inputenc} % UTF-8エンコーディング
 \usepackage{amsmath, amssymb} % 数式パッケージ
-\usepackage{graphicx} % 画像挿入
-\usepackage{hyperref} % ハイパーリンク
+\usepackage[dvipdf]{graphicx} % 画像挿入
+\usepackage[dvipdfmx,breaklinks=true]{hyperref}
 \usepackage{geometry} % レイアウト設定
 \usepackage{caption} % キャプション調整
 \usepackage{float} % 画像配置の制御
@@ -31,53 +31,119 @@
 
 % タイトル
 \maketitle
-\begin{abstract}
-本レポートでは、実験の目的、方法、結果、考察について記述する。以下に内容の概要を示す。
-\end{abstract}
 
-% セクション1: 実験の目的
-\section{実験の目的}
-この実験の目的は、○○の物理特性を測定し、その挙動を理解することである。
+\section{観測結果と考察}
+\subsection{観測場所}
+観測は2号館12階の教室で実施した.
 
-% セクション2: 実験方法
-\section{実験方法}
-\subsection{使用した機器}
+\subsection{観測データの整理}
 \begin{itemize}
-    \item オシロスコープ
-    \item マルチメーター
-    \item 電源装置
+    \item 周波数: 80 MHz
+    \item 強度: -80 dBm
+    \item 観測されたスペクトラム:
+    \begin{itemize}
+        \item 1枚目の画像はFM信号である.
+        \item 2枚目の画像はNHK信号である.
+    \end{itemize}
 \end{itemize}
 
-\subsection{手順}
-以下の手順で実験を行った。
+\subsection{観測スペクトラムの画像}
+以下に観測したスペクトラムのスクリーンキャプチャを示す.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{data1/day1/FM.png}
+    \caption{片側カラム内の画像}
+    \label{fig:image1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{data1/day1/NHK.png}
+    \caption{NHK信号のスペクトラム}
+    \label{fig:nhk_spectrum}
+\end{figure}
 \begin{enumerate}
-    \item 回路を組み立てた。
-    \item 各測定点の電圧を測定した。
-    \item データを記録し、結果を整理した。
+    \item グラフの中心周波数と横幅：
+    \begin{itemize}
+        \item \textbf{中心周波数：} 0 Hz（ベースバンド表示）
+        \item \textbf{横幅：} \(\pm f_s/2\)（標本化周波数 \(f_s\) に依存）
+    \end{itemize}
+    \item 実際の信号とスペクトルの対応：
+    \begin{itemize}
+        \item 見えているスペクトルはUSRPによってキャリア周波数 \(f_c\) が除去されたもの。
+        \item スペクトルを \(f_c\) 平行移動すれば元の信号スペクトルに一致する。
+    \end{itemize}
+    \item 理論的背景：
+    \begin{itemize}
+        \item ナイキスト周波数：標本化定理に基づき、スペクトルは \(-f_s/2 \sim f_s/2\) に制限される。
+        \item フーリエ変換の周波数シフト性：
+        \[
+        \mathcal{F}\{x(t) e^{-j2\pi f_c t}\}(f) = X(f + f_c)
+        \]
+        これにより平行移動が可能。
+    \end{itemize}
 \end{enumerate}
 
-% セクション3: 実験結果
-\section{実験結果}
-\subsection{測定データ}
-表\ref{tab:results}に測定したデータを示す。
 
-\begin{table}[H]
+\section{課題2}
+\subsection*{FM変調の原理}
+FM変調は、音声信号 \(m(t)\) を用いて搬送波の周波数を変化させる方式である。送信信号は以下で表される：
+\[
+s(t) = A \cos \left( 2 \pi f_c t + 2 \pi k \int m(t) \, dt \right)
+\]
+ここで、
+\begin{itemize}
+    \item \(f_c\)：搬送波の中心周波数
+    \item \(k\)：周波数変調指数
+    \item \(\int m(t) dt\)：音声信号の積分
+\end{itemize}
+
+USRPでは、複素IQ信号として搬送されるため、以下の形に変換される：
+\[
+s_{IQ}(t) = e^{j \left( 2 \pi f_c t + 2 \pi k \int m(t) \, dt \right)}
+\]
+
+\subsection*{FM復調の原理}
+FM復調では、受信信号 \(s(t)\) から瞬時周波数を抽出する。理論上は以下の操作を行う：
+\[
+f_{\text{inst}}(t) = \frac{1}{2 \pi} \frac{d}{dt} \arg \left( s_{IQ}(t) \right)
+\]
+これにより、音声信号 \(m(t)\) を復元する。
+
+\subsection*{ブロックダイアグラムとの対応}
+以下に、FM送受信機のブロックダイアグラムを示す。
+
+\begin{figure}[h]
     \centering
-    \caption{測定結果}
-    \label{tab:results}
-    \begin{tabular}{|c|c|c|}
-        \hline
-        測定点 & 電圧[V] & 電流[A] \\
-        \hline
-        A      & 5.0     & 0.1     \\
-        B      & 10.0    & 0.2     \\
-        C      & 15.0    & 0.3     \\
-        \hline
-    \end{tabular}
-\end{table}
+    \includegraphics[width=0.8\linewidth]{diagram1.png}
+    \caption{FM送信機ブロック図}
+\end{figure}
 
-\subsection{グラフ}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\linewidth]{diagram2.png}
+    \caption{FM受信機ブロック図}
+\end{figure}
 
+\subsection*{受信についての考察}
+\begin{itemize}
+    \item \textbf{IQ rateの限界}：
+    理論上、標本化定理より帯域幅の2倍まで下げられる。ただし、ノイズやフィルタリングの影響を考慮する必要がある。
+    \item \textbf{音質とIQ rateの関係}：
+    IQ rateが低いと、帯域幅が狭くなり高周波成分が失われるため、音質が劣化する。
+\end{itemize}
+
+\subsection*{送信についての考察}
+\begin{itemize}
+    \item \textbf{適切な \(k\) の値}：
+    実験では \(k \approx 10^{-6}\) 程度が適切だった。この値は音声信号の振幅とFM変調器の設計による。
+    \item \textbf{リサンプリングと積分の順序}：
+    リサンプリングを積分前に行うことで、高精度な積分が可能になる。
+\end{itemize}
+
+\subsection*{FMの音質が良い理由}
+FMでは振幅成分が一定で、ノイズが加わっても信号の周波数変化に影響を与えにくいため、AMより音質が良い。また、FMは広い帯域幅を利用できるため、高周波成分を含む信号を忠実に再現できる。
 
 % セクション4: 考察
 \section{考察}
