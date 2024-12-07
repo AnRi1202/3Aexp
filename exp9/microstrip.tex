@@ -23,7 +23,7 @@
 \titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{1em}{} % サブセクションタイトル
 
 % タイトル情報
-\title{後期実験9(後半) 無線通信を支える技術
+\title{後期実験9(前半) 無線通信を支える技術
 ～アンテナと通信方式の実践的理解～}
 \author{学籍番号: 03240470 \and 氏名: 井手陸大}
 \date{\today}
@@ -51,100 +51,70 @@ VNAは主に以下のコンポーネントで構成される:
 
 \subsection{校正}
 高精度な測定を行うため, VNAは測定系自身が持つ誤差成分を補正する校正を行う. 一般的な校正手法として, オープン（開放）, ショート（短絡）, ロード（無反射終端器）を用いたSOLT法がある. 校正により, 測定系の誤差要因である方向性, ソースマッチ, ロードマッチ, 伝送周波数レスポンス, 反射周波数レスポンス, アイソレーション（リーケージ）を補正し, 高い測定確度を実現する.
-\section{実験課題 (2) マイクロストリップラインの特性測定}
-マイクロストリップラインの特性インピーダンス \(Z_0\) および伝搬定数（減衰定数 \(\alpha\) と位相定数 \(\beta\)）を, ネットワークアナライザを用いて測定した. 測定手順と計算方法, および結果について以下に述べる.
 
-\subsection{測定手順}
-\begin{enumerate}
-    \item ネットワークアナライザを校正（キャリブレーション）する.
-    \item 作製したマイクロストリップラインをテストフィクスチャに装着し, 入力ポート反射係数 \(S_{11}\) および透過係数 \(S_{21}\) を測定する.
-    \item 測定データから, 振幅および位相の周波数依存性を記録する.
-    \item 反射が最も小さかったラインを基準ライン（50 \(\Omega\) ライン）として, 実効誘電率 \(\varepsilon_{\text{eff}}\), 減衰定数 \(\alpha\), 位相定数 \(\beta\) を計算する.
-\end{enumerate}
 
-\subsection{特性インピーダンスと実効誘電率の計算}
-特性インピーダンス \(Z_0\) は次式で近似される:
-\[
-Z_0 = \frac{60}{\sqrt{\varepsilon_{\text{eff}}}} \ln \left( 8\frac{h}{W} + 0.25 \frac{W}{h} \right)
-\]
-ここで,
-\begin{itemize}
-    \item \(\varepsilon_{\text{eff}}\): 実効誘電率
-    \item \(h\): 基板の厚さ
-    \item \(W\): ストリップラインの幅
-\end{itemize}
+\section{実験課題 (2): 特性測定結果}
 
-実効誘電率は次式で計算される:
-\[
-\varepsilon_{\text{eff}} = \frac{\varepsilon_r + 1}{2} + \frac{\varepsilon_r - 1}{2} \left( 1 + 12 \frac{h}{W} \right)^{-1/2}
-\]
-ここで, \(\varepsilon_r\) は基板の誘電率を表す.
-
-\subsection{伝搬定数の計算}
-伝搬定数 \(\gamma\) は次式で表される:
-\[
-\gamma = \alpha + j\beta
-\]
-ここで,
-\begin{itemize}
-    \item \(\alpha\): 減衰定数（単位: \(\text{Np/m}\)）
-    \item \(\beta\): 位相定数（単位: \(\text{rad/m}\)）
-\end{itemize}
-
-位相定数 \(\beta\) は次式で計算される:
-\[
-\beta = \frac{2\pi f}{v_p}, \quad v_p = \frac{c}{\sqrt{\varepsilon_{\text{eff}}}}
-\]
-減衰定数 \(\alpha\) は \(S_{21}\) の振幅減衰から以下のように求められる:
-\[
-\alpha = -\frac{1}{L} \ln |S_{21}|
-\]
-ここで, \(L\) はストリップラインの長さを表す.
-
-\subsection{実験結果}
-実験で得られた測定結果を以下に示す. 減衰定数と位相定数は50 \(\Omega\) ラインを基準として計算した.
+\subsection{実験条件}
+実験では,以下の条件下で特性インピーダンス \( Z_0 \), 位相定数 \(\beta\), および減衰定数 \(\alpha\) を求めた.
+基板の厚さ \( h \) を 1 mm, 比誘電率 \( \epsilon_r = 4.7 \), 周波数 \( f = 1 \, \text{GHz} \) とし, マイクロストリップライン幅の比 \( W/h \) および \(\sqrt{\epsilon_{\text{eff}}}\) の組み合わせを次の通りとした:
 
 \[
-\begin{array}{|c|c|c|c|c|c|}
+\begin{array}{|c|c|}
 \hline
-Z_0 (\Omega) & \sqrt{\varepsilon_{\text{eff}}} & \varepsilon_{\text{eff}} & W/h & \alpha (\text{Np/m}) & \beta (\text{rad/m}) \\
+\sqrt{\epsilon_{\text{eff}}} & W/h \\
 \hline
-30 & 1.85 & 3.42 & 4.34 & - & - \\
-40 & 1.85 & 3.42 & 3.19 & - & - \\
-50 & 1.9 & 3.61 & 2.35 & 8.62 & 119.5 \\
-60 & 1.9 & 3.61 & 1.89 & - & - \\
-70 & 2.0 & 4.00 & 1.51 & - & - \\
+1.85 & 4.34 \\
+1.85 & 3.19 \\
+1.90 & 2.35 \\
+1.90 & 1.89 \\
+2.00 & 1.51 \\
 \hline
 \end{array}
 \]
 
-\subsection{考察}
-測定結果から, 50 \(\Omega\) ラインが基準ラインとして適していることが確認された. 特性インピーダンス \(Z_0 = 50 \, \Omega\) のラインは, 測定系のインピーダンスに最も近い値を示し, 減衰定数および位相定数も適切な範囲に収まった. 
+\subsection{特性インピーダンスの計算}
+特性インピーダンス \( Z_0 \) は以下の式で計算する:
+\[
+Z_0 = \frac{377}{W/h + \frac{2}{\pi} \left( 1 + \ln\left(1 + \frac{\pi}{2} W/h\right)\right)}
+\]
 
-また, 減衰定数 \(\alpha = 8.62 \, \text{Np/m}\), 位相定数 \(\beta = 119.5 \, \text{rad/m}\) を得た. 誘電率のばらつきや測定誤差の影響を排除するため, キャリブレーション精度をさらに向上させることが重要である.
+\subsection{位相定数と減衰定数の計算}
 
-\subsection{参考文献}
-文献は以下に示す.
+位相定数 \(\beta\) は以下の式を用いて計算する:
+\[
+\beta = \omega \sqrt{\epsilon \mu_0}, \quad \epsilon = \epsilon_0 \epsilon_{\text{eff}}, \quad \omega = 2 \pi f
+\]
+ここで, 実効誘電率 \( \epsilon_{\text{eff}} \) はストリップライン幅 \( W \) に基づき次式で計算する:
+\[
+\epsilon_{\text{eff}} = \frac{\epsilon_r + 1}{2} + \frac{\epsilon_r - 1}{2} \left(1 + 12 \frac{h}{W}\right)^{-1/2}, \quad \epsilon_r = 4.7
+\]
 
-\begin{thebibliography}{9}
-    \bibitem{jemima}
-    一般社団法人 日本電気計測器工業会,
-    \textit{ネットワークアナライザ},
-    \url{https://www.jemima.or.jp/tech/3-09-01.html},
-    Accessed: 2024-12-07.
+減衰定数 \(\alpha\) は以下の式で計算する:
+\[
+\alpha \approx \frac{1}{2} \sqrt{\epsilon_{\text{eff}}} \beta \tan \delta + \frac{\epsilon_{\text{eff}} R_s}{\zeta h}
+\]
+ここで, \( \tan \delta = 0.02 \), \( R_s = \sqrt{\frac{\omega \mu_0}{2 \sigma_{\text{cond}}}}, \, \sigma_{\text{cond}} = 5.8 \times 10^7 \, \text{S/m} \), \( h = 1 \, \text{mm} \).
 
-    \bibitem{ni}
-    National Instruments,
-    \textit{Introduction to Network Analyzer Measurements},
-    \url{https://download.ni.com/evaluation/rf/Introduction_to_Network_Analyzer_Measurements.pdf},
-    Accessed: 2024-12-07.
+基板の比誘電率が \( \epsilon_r = 4.7 \) であることから,基板は FR-4 と仮定した. また,損失正接 \( \tan\delta \) は FR-4 の典型値である 0.02 を採用した. 導体金属は銅と仮定し,その導電率を \( \sigma_{\text{cond}} = 5.8 \times 10^7 \, \text{S/m} \) とした.
 
-    \bibitem{coppermountain}
-    Copper Mountain Technologies,
-    \textit{How Does a Vector Network Analyzer Work?},
-    \url{https://coppermountaintech.com/how-does-a-vector-network-analyzer-work/},
-    Accessed: 2024-12-07.
-\end{thebibliography}
+\subsection{計算結果}
+実験条件下での計算結果を以下に示す:
+
+\[
+\begin{array}{|c|c|c|c|}
+\hline
+\sqrt{\epsilon_{\text{eff}}} & W/h & \alpha \, (\text{Np/m}) & \beta \, (\text{rad/m}) \\
+\hline
+1.85 & 4.34 & 281,984 & 1.409 \times 10^7 \\
+1.85 & 3.19 & 265,095 & 1.366 \times 10^7 \\
+1.90 & 2.35 & 251,540 & 1.331 \times 10^7 \\
+1.90 & 1.89 & 243,105 & 1.309 \times 10^7 \\
+2.00 & 1.51 & 237,347 & 1.293 \times 10^7 \\
+\hline
+\end{array}
+\]
+
 
 \end{document}
 
