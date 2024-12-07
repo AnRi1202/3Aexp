@@ -23,7 +23,8 @@
 \titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{1em}{} % サブセクションタイトル
 
 % タイトル情報
-\title{後期実験9}
+\title{後期実験9(後半) 無線通信を支える技術
+～アンテナと通信方式の実践的理解～}
 \author{学籍番号: 03240470 \and 氏名: 井手陸大}
 \date{\today}
 
@@ -226,6 +227,88 @@ FSK信号の復調器ではまずIQ信号から位相 \(\theta(t)\) を取り出
     \caption{FSK受信機ブロックダイアグラム}
     \label{fig:fsk_receiver_block}
 \end{figure}
+
+\section{課題4: ASKとPSKの変復調の実装と考察}
+\subsection{ASK変調と復調の原理}
+ASK（Amplitude Shift Keying）はデジタル変調方式の一種であり, デジタル信号の値に応じて搬送波の振幅を変化させる方式である. ASK変調された信号は次式で表される:
+\[
+s_{\text{ASK}}(t) =
+\begin{cases}
+A \cos(2\pi f_c t) & \text{（ビットが1の場合）}, \\
+0 & \text{（ビットが0の場合）}.
+\end{cases}
+\]
+ここで, \(A\) は搬送波の振幅, \(f_c\) は搬送波周波数を表す.
+
+ASK変調器では, デジタル信号 \(m(t)\) を搬送波と乗算することで振幅変調を実現する. ASK送信機のブロックダイアグラムのスクリーンショットを撮り忘れたため, ここでは省略する.
+
+ASK信号を復調する際は, 受信信号をエンベロープ検出器に通すことで信号の振幅を復元し, コンパレータを用いて「0」と「1」を判定する. Figure \ref{fig:ask_receiver_block} にASK受信機のブロックダイアグラムを示す.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{./data1/day4/ASK_receiver_block.png}
+    \caption{ASK受信機ブロックダイアグラム}
+    \label{fig:ask_receiver_block}
+\end{figure}
+
+受け取った信号を絶対値として取得し, ローパスフィルタを通すことで高周波成分を除去する. さらに, 一定の閾値を超えた場合は1と判定し, それ以外の場合は0と判定する.
+
+Figure \ref{fig:ask_receiver_wave} には, ローパスフィルタ通過前の波形と, 最終的な復調波形を示している.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{./data1/day4/ASK_receiver_wave.png}
+    \caption{ASK復調後の波形}
+    \label{fig:ask_receiver_wave}
+\end{figure}
+
+\subsection{PSK変調と復調の原理}
+PSK（Phase Shift Keying）はデジタル変調方式の一種であり, ビットの値に応じて搬送波の位相を変化させる方式である. PSK変調された信号は次式で表される:
+\[
+s_{\text{PSK}}(t) = A \cos(2\pi f_c t + \phi),
+\]
+ここで, 位相 \(\phi\) は次のように設定される:
+\[
+\phi =
+\begin{cases}
+0 & \text{（ビットが1の場合）}, \\
+\pi & \text{（ビットが0の場合）}.
+\end{cases}
+\]
+
+PSK変調器では, デジタル信号に応じて搬送波の位相を変化させることで信号が生成される. Figure \ref{fig:psk_sender_block} にPSK送信機のブロックダイアグラムを示す.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{./data1/day4/PSK_sender_block.png}
+    \caption{PSK送信機ブロックダイアグラム}
+    \label{fig:psk_sender_block}
+\end{figure}
+
+途中まではFMと同様の処理をしており, 最後に\(\pi\)をかけることで, 1の信号では位相が反転するようになっている.
+
+PSK信号の復調にはIQ信号から位相を取り出せばよい. Figure \ref{fig:psk_receiver_block} にPSK受信機のブロックダイアグラムを示す.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{./data1/day4/PSK_receiver_block.png}
+    \caption{PSK受信機ブロックダイアグラム}
+    \label{fig:psk_receiver_block}
+\end{figure}
+
+Figure \ref{fig:psk_receiver_wave} には, 復調後の信号波形を示している. 位相の違いに基づいて信号が正確に復元されていることが確認できる.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{./data1/day4/PSK_receiver_wave.png}
+    \caption{PSK復調後の波形}
+    \label{fig:psk_receiver_wave}
+\end{figure}
+
+\subsection{考察}
+ASKとPSKの比較を行う. ASKは信号の振幅を変化させることでデータを送信するため, ノイズに対する耐性が低く, 受信品質が劣化しやすいという特性がある. 一方, PSKは信号の位相を変化させることでデータを送信するため, 振幅の変化による影響を受けにくく, ノイズ耐性が高い.
+
+今回の実験では, Figure \ref{fig:ask_receiver_wave} および Figure \ref{fig:psk_receiver_wave} に示されるように, 両方式とも信号の復元に成功した. しかし, 実環境におけるノイズの影響を考慮すると, PSKがより信頼性の高い方式であるといえる.
 
 
 \end{document}
