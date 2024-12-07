@@ -314,6 +314,8 @@ TSWLatexianTemp*
 # Ignore data1 folder
 data1/
 
+data/
+
 # End of https://www.toptal.com/developers/gitignore/api/latex
 
 

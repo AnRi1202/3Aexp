@@ -10,28 +10,141 @@
 \usepackage{siunitx} % SI単位系
 \usepackage{multicol} % 必要に応じて複数列対応
 
+% ページの余白を調整
+\geometry{
+  top=25mm,
+  bottom=25mm,
+  left=20mm,
+  right=20mm
+}
+
+% タイトルとセクションのフォーマット調整
+\titleformat{\section}{\large\bfseries}{\thesection}{1em}{} % セクションタイトル
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{1em}{} % サブセクションタイトル
+
+% タイトル情報
+\title{後期実験9(後半) 無線通信を支える技術
+～アンテナと通信方式の実践的理解～}
+\author{学籍番号: 03240470 \and 氏名: 井手陸大}
+\date{\today}
+
 \begin{document}
 
-% タイトル
 \maketitle
 
-\section*{考察事項}
-レポートは以下の事項について文献を調査し、実験結果を示しながら記述すること。出典は必ず示すこと。ChatGPT 等を参照する場合も出典は書籍などの文献に依ること。
+\section{ネットワークアナライザの動作原理と装置の仕組み}
+ネットワークアナライザは, 高周波回路やデバイスの特性を評価するための計測器であり, 特に反射係数や伝送特性を測定する際に使用される. その中でも, ベクトルネットワークアナライザ（VNA）は, 信号の振幅と位相の両方を測定できるため, より詳細な特性評価が可能である.
 
-\subsection*{(1) ネットワークアナライザの動作原理、装置の仕組みを論じよ。}
-% ここにネットワークアナライザの動作原理と装置の仕組みについて記述する
+\subsection{動作原理}
+VNAは, 信号源から生成された高周波信号をデバイスアンダーテスト（DUT）に入力し, DUTからの反射信号や透過信号を測定する. これにより, DUTのSパラメータ（散乱パラメータ）を取得し, 反射特性や伝送特性を評価する. Sパラメータは, 入射波と反射波, 透過波の関係を示す複素数で表され, 振幅と位相の情報を含む.
 
-\subsection*{(2) 実験課題 (2) の特性測定結果から、各ストリップラインの特性インピーダンス、伝搬定数 (減衰定数と位相定数) を求めよ。}
-% ここに実験課題 (2) の特性測定結果と各ストリップラインの特性インピーダンス、伝搬定数について記述する
+\subsection{装置の仕組み}
+VNAは主に以下のコンポーネントで構成される:
+\begin{enumerate}
+    \item \textbf{信号源}: 広範囲の周波数で安定した高周波信号を生成する.
+    \item \textbf{信号分離器（パワースプリッタ）}: 生成された信号を基準信号とDUTへの入射信号に分離する.
+    \item \textbf{方向性結合器（カプラ）}: DUTからの反射信号や透過信号を分離して検出する.
+    \item \textbf{受信機}: 基準信号とDUTからの信号を受信し, 振幅と位相を測定する.
+\end{enumerate}
 
-\subsection*{(3) 実験課題 (6) で自分が設計・試作した平面回路素子に関し、設計指針と理論的な特性予測に関し記述せよ。次に、試作素子において実測した特性との比較考察を行え。予測通りにならなかった場合、その原因を考察せよ。}
-% ここに実験課題 (6) で設計・試作した平面回路素子の設計指針と理論的な特性予測、実測した特性との比較考察を記述する
+測定された信号はデジタル処理され, スミスチャートや対数振幅, 位相, 群遅延などの形式で表示される. DUTの特性評価を精度良く行うためには, これらのデータが不可欠である.
 
-\subsection*{(4) 実験課題 (7) で作製したパッチアンテナについて、その放射パターンの形状がどのように決まるか、考察せよ。}
-% ここに実験課題 (7) で作製したパッチアンテナの放射パターンの形状について記述する
+\subsection{校正}
+高精度な測定を行うため, VNAは測定系自身が持つ誤差成分を補正する校正を行う. 一般的な校正手法として, オープン（開放）, ショート（短絡）, ロード（無反射終端器）を用いたSOLT法がある. 校正により, 測定系の誤差要因である方向性, ソースマッチ, ロードマッチ, 伝送周波数レスポンス, 反射周波数レスポンス, アイソレーション（リーケージ）を補正し, 高い測定確度を実現する.
+\section{実験課題 (2) マイクロストリップラインの特性測定}
+マイクロストリップラインの特性インピーダンス \(Z_0\) および伝搬定数（減衰定数 \(\alpha\) と位相定数 \(\beta\)）を, ネットワークアナライザを用いて測定した. 測定手順と計算方法, および結果について以下に述べる.
 
-\subsection*{(5) パッチアンテナが他の無線機器からの電波を受信するなど、実験期間中に経験した興味深い結果、事象について考察せよ。}
-% ここにパッチアンテナが他の無線機器からの電波を受信するなど、実験期間中に経験した興味深い結果、事象について記述する
+\subsection{測定手順}
+\begin{enumerate}
+    \item ネットワークアナライザを校正（キャリブレーション）する.
+    \item 作製したマイクロストリップラインをテストフィクスチャに装着し, 入力ポート反射係数 \(S_{11}\) および透過係数 \(S_{21}\) を測定する.
+    \item 測定データから, 振幅および位相の周波数依存性を記録する.
+    \item 反射が最も小さかったラインを基準ライン（50 \(\Omega\) ライン）として, 実効誘電率 \(\varepsilon_{\text{eff}}\), 減衰定数 \(\alpha\), 位相定数 \(\beta\) を計算する.
+\end{enumerate}
+
+\subsection{特性インピーダンスと実効誘電率の計算}
+特性インピーダンス \(Z_0\) は次式で近似される:
+\[
+Z_0 = \frac{60}{\sqrt{\varepsilon_{\text{eff}}}} \ln \left( 8\frac{h}{W} + 0.25 \frac{W}{h} \right)
+\]
+ここで,
+\begin{itemize}
+    \item \(\varepsilon_{\text{eff}}\): 実効誘電率
+    \item \(h\): 基板の厚さ
+    \item \(W\): ストリップラインの幅
+\end{itemize}
+
+実効誘電率は次式で計算される:
+\[
+\varepsilon_{\text{eff}} = \frac{\varepsilon_r + 1}{2} + \frac{\varepsilon_r - 1}{2} \left( 1 + 12 \frac{h}{W} \right)^{-1/2}
+\]
+ここで, \(\varepsilon_r\) は基板の誘電率を表す.
+
+\subsection{伝搬定数の計算}
+伝搬定数 \(\gamma\) は次式で表される:
+\[
+\gamma = \alpha + j\beta
+\]
+ここで,
+\begin{itemize}
+    \item \(\alpha\): 減衰定数（単位: \(\text{Np/m}\)）
+    \item \(\beta\): 位相定数（単位: \(\text{rad/m}\)）
+\end{itemize}
+
+位相定数 \(\beta\) は次式で計算される:
+\[
+\beta = \frac{2\pi f}{v_p}, \quad v_p = \frac{c}{\sqrt{\varepsilon_{\text{eff}}}}
+\]
+減衰定数 \(\alpha\) は \(S_{21}\) の振幅減衰から以下のように求められる:
+\[
+\alpha = -\frac{1}{L} \ln |S_{21}|
+\]
+ここで, \(L\) はストリップラインの長さを表す.
+
+\subsection{実験結果}
+実験で得られた測定結果を以下に示す. 減衰定数と位相定数は50 \(\Omega\) ラインを基準として計算した.
+
+\[
+\begin{array}{|c|c|c|c|c|c|}
+\hline
+Z_0 (\Omega) & \sqrt{\varepsilon_{\text{eff}}} & \varepsilon_{\text{eff}} & W/h & \alpha (\text{Np/m}) & \beta (\text{rad/m}) \\
+\hline
+30 & 1.85 & 3.42 & 4.34 & - & - \\
+40 & 1.85 & 3.42 & 3.19 & - & - \\
+50 & 1.9 & 3.61 & 2.35 & 8.62 & 119.5 \\
+60 & 1.9 & 3.61 & 1.89 & - & - \\
+70 & 2.0 & 4.00 & 1.51 & - & - \\
+\hline
+\end{array}
+\]
+
+\subsection{考察}
+測定結果から, 50 \(\Omega\) ラインが基準ラインとして適していることが確認された. 特性インピーダンス \(Z_0 = 50 \, \Omega\) のラインは, 測定系のインピーダンスに最も近い値を示し, 減衰定数および位相定数も適切な範囲に収まった. 
+
+また, 減衰定数 \(\alpha = 8.62 \, \text{Np/m}\), 位相定数 \(\beta = 119.5 \, \text{rad/m}\) を得た. 誘電率のばらつきや測定誤差の影響を排除するため, キャリブレーション精度をさらに向上させることが重要である.
+
+\subsection{参考文献}
+文献は以下に示す.
+
+\begin{thebibliography}{9}
+    \bibitem{jemima}
+    一般社団法人 日本電気計測器工業会,
+    \textit{ネットワークアナライザ},
+    \url{https://www.jemima.or.jp/tech/3-09-01.html},
+    Accessed: 2024-12-07.
+
+    \bibitem{ni}
+    National Instruments,
+    \textit{Introduction to Network Analyzer Measurements},
+    \url{https://download.ni.com/evaluation/rf/Introduction_to_Network_Analyzer_Measurements.pdf},
+    Accessed: 2024-12-07.
+
+    \bibitem{coppermountain}
+    Copper Mountain Technologies,
+    \textit{How Does a Vector Network Analyzer Work?},
+    \url{https://coppermountaintech.com/how-does-a-vector-network-analyzer-work/},
+    Accessed: 2024-12-07.
+\end{thebibliography}
 
 \end{document}
 
