@@ -91,105 +91,141 @@ FMラジオの観測結果について, Figure \ref{fig:fm_spectrum} に示さ�
 これにより, 受信信号の特性を正確に分析可能である.
 
 
-\section*{課題2: FM送受信機の実装}
+\section{課題2: FM変復調器の原理と考察}
 
-\subsection*{考察事項}
-FM変復調器の原理を数式とブロックダイアグラムを用いて説明する。
+\subsection{FM変調器の原理}
+FM変調された信号は次のように表される.
 
-\subsection*{FM変調の原理}
-FM変調は、音声信号 \(m(t)\) を用いて搬送波の周波数を変化させる方式である。送信信号は以下で表される：
 \[
-s(t) = A \cos \left( 2 \pi f_c t + 2 \pi k \int m(t) \, dt \right)
-\]
-ここで、
-\begin{itemize}
-    \item \(f_c\)：搬送波の中心周波数
-    \item \(k\)：周波数変調指数
-    \item \(\int m(t) dt\)：音声信号の積分
-\end{itemize}
-
-USRPでは、複素IQ信号として搬送されるため、以下の形に変換される：
-\[
-s_{IQ}(t) = e^{j \left( 2 \pi f_c t + 2 \pi k \int m(t) \, dt \right)}
+s(t) = A \cos \left( 2 \pi f_c t + k \int m(t) \, dt \right)
 \]
 
-\subsection*{FM復調の原理}
-FM復調では、受信信号 \(s(t)\) から瞬時周波数を抽出する。理論上は以下の操作を行う：
+ここで,
+\begin{itemize}
+    \item \( A \): 信号の振幅
+    \item \( f_c \): 搬送波の中心周波数
+    \item \( k \): 周波数偏移係数
+\end{itemize}
+
+FM変調の実装においては, 積分器を使用して信号を処理し, 搬送波の位相を制御する. ブロックダイアグラム（Figure \ref{fig:fm_sender_block}）では, 積分器, 変調器, およびUSRPが示されており, 音声信号がFM信号として変調される様子を確認できる.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{./data1/day2/fm_sender_block.png}
+    \caption{FM送信機ブロックダイアグラム}
+    \label{fig:fm_sender_block}
+\end{figure}
+
+\subsection{FM復調器の原理}
+FM復調は, FM変調された信号 \( s(t) \) の瞬時周波数を検出することで情報信号 \( m(t) \) を復元する方式である. 瞬時周波数は次の式で計算される.
+
 \[
-f_{\text{inst}}(t) = \frac{1}{2 \pi} \frac{d}{dt} \arg \left( s_{IQ}(t) \right)
+f_{\text{inst}}(t) = \frac{1}{2\pi} \frac{d}{dt} \arg(s(t))
 \]
-これにより、音声信号 \(m(t)\) を復元する。
 
-\subsection*{ブロックダイアグラムとの対応}
-以下に、FM送受信機のブロックダイアグラムを示す。
+USRPを用いた実装では, 複素IQ信号として搬送波が表現されているため, 次の手順を用いて復調を行う.
+1. \( s(t) \) の複素信号の位相を計算する.
+2. 位相の微分を求めることで瞬時周波数を得る.
+3. 瞬時周波数から情報信号 \( m(t) \) を復元する.
 
+ブロックダイアグラム（Figure \ref{fig:fm_receiver_block}）には, 復調プロセスの主要コンポーネントが示されている.
 
-\subsection*{受信についての考察}
-\begin{itemize}
-    \item \textbf{IQ rateの限界}：
-    理論上、標本化定理より帯域幅の2倍まで下げられる。ただし、ノイズやフィルタリングの影響を考慮する必要がある。
-    \item \textbf{音質とIQ rateの関係}：
-    IQ rateが低いと、帯域幅が狭くなり高周波成分が失われるため、音質が劣化する。
-\end{itemize}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{./data1/day2/fm_receiver_block.png}
+    \caption{FM受信機ブロックダイアグラム}
+    \label{fig:fm_receiver_block}
+\end{figure}
 
-\subsection*{送信についての考察}
-\begin{itemize}
-    \item \textbf{適切な \(k\) の値}：
-    実験では \(k \approx 10^{-6}\) 程度が適切だった。この値は音声信号の振幅とFM変調器の設計による。
-    \item \textbf{リサンプリングと積分の順序}：
-    リサンプリングを積分前に行うことで、高精度な積分が可能になる。
-\end{itemize}
+\subsection{受信についての考察}
+理論的には, IQレートは信号の帯域幅の2倍であるナイキスト周波数を超えていれば十分である. FMラジオでは帯域幅が約200kHzであるため, 最低限のIQレートは400kHzとなる. しかし, 実際にはノイズやフィルタリングの影響を考慮し, 余裕を持たせたIQレートが必要である.
 
-\subsection*{FMの音質が良い理由}
-FMでは振幅成分が一定で、ノイズが加わっても信号の周波数変化に影響を与えにくいため、AMより音質が良い。また、FMは広い帯域幅を利用できるため、高周波成分を含む信号を忠実に再現できる。
+実験では, IQレートを195.312kHz以下に設定することができなかった. これは, USRPが対応する最低サンプリングレートによる制約であると考えられる.
 
-\section*{課題3: FSK変復調器の実装}
+IQレートが低い場合, 帯域幅が狭まり高周波成分が失われるため, 音質が劣化する. しかし, FMの帯域幅が200kHzであるため, IQレートが195.312kHzでも音質の低下は感じられなかった. 仮にIQレートをこれ以上下げることができた場合, 音質の低下が感じられる可能性がある. 実際, 人間の聞こえる周波数帯域は20Hzから20kHz程度である. よって, IQレートを40kHz程度にすると音質の低下が明確になると予想される.
 
-\subsection*{考察}
-FSK変復調器の原理を数式とブロックダイアグラムを用いて説明する。
+また, 人の会話や音楽の主要な周波数成分はおおよそ1kHz程度であるため, IQレートを2kHzほどに設定すると声や音楽が正しく復元されず, 聴き取れなくなると予想される.
 
-\subsection*{FSK変調の原理}
-FSK変調は、デジタルデータを用いて搬送波の周波数を変化させる方式である。送信信号は以下で表される：
+\subsection{送信についての考察}
+
+今回の実験では周波数偏移係数 \(k\) の値を \(10^6\) にした.  
+この値を選定する理由について考察を行う.
+
+音声信号を \(m(t) = \sin(2\pi f t)\) とすると,その積分は次式で与えられる:
 \[
-s(t) = 
+\int m(t) \, dt = -\frac{\cos(2\pi f t)}{2\pi f}.
+\]
+このとき,積分結果の振れ幅（最大値）は次のように表せる:
+\[
+\text{振れ幅} = \frac{1}{2\pi f}.
+\]
+仮に音声信号の周波数が \(f = 1\,\mathrm{kHz}\) とすると,振れ幅は次のようになる:
+\[
+\text{振れ幅} = \frac{1}{2\pi \cdot 1000} \approx 0.000159\,\text{(約0.16m)}.
+\]
+
+この値は搬送波周波数 \(f_c = 80\,\mathrm{MHz}\) に対して極めて小さい.
+
+FM変調では,この積分結果に周波数偏移係数 \(k\) を掛けて搬送波周波数を偏移させる.したがって, \(k\) の値が十分に大きくない場合,積分値による周波数変化が搬送波周波数に対して目立たなくなり,適切な変調が行えなくなる.
+
+今回の実験では \(k = 10^6\) と設定した.このとき,積分値に基づく周波数変化の振れ幅は次式で示される:
+\[
+k \cdot \int m(t) dt = 10^6 \cdot 0.000159 \approx 159\,\mathrm{kHz}.
+\]
+この結果,FMラジオの帯域幅（通常 \(\pm 75\,\mathrm{kHz}\)）を十分にカバーするだけでなく,搬送波周波数 \(f_c = 80\,\mathrm{MHz}\) に対して適切な周波数偏移が付与されることがわかる.
+
+以上より,周波数偏移係数 \(k = 10^6\) の設定は,音声信号が適切に変調されるための妥当な選択であると結論付けられる.
+
+\subsection{FMとAMの音質の比較}
+FMは, 振幅ではなく周波数で情報を伝達するため, 振幅の変動によるノイズの影響を受けにくい. これにより, AMよりも音質が良くなる. また, FMでは広い帯域幅を利用できるため, 高周波成分を含む信号を忠実に再現することができる. この特性により, FMは音楽や音声の伝送において高い品質を実現できる.
+
+\section{課題3: FSK変復調器の原理と考察}
+\subsection{FSK変調器の原理}
+FSK（Frequency Shift Keying）はデジタル変調方式の一種であり, ビットの値によって搬送波周波数が変化する. 具体的には, ビット「0」と「1」に異なる周波数 \(f_0\) と \(f_1\) を対応させることで情報を伝送する.
+
+FSK変調された信号は次式で表される:
+\[
+s(t) = A \cos \left( 2\pi f t \right),
+\]
+ここで周波数 \(f\) は以下の条件に基づいて選択される:
+\[
+f = 
 \begin{cases} 
-A \cos \left( 2 \pi f_1 t \right) & \text{デジタルデータが1の場合} \\
-A \cos \left( 2 \pi f_0 t \right) & \text{デジタルデータが0の場合}
+f_c + \Delta f & \text{（ビットが1の場合）}, \\
+f_c & \text{（ビットが0の場合）}.
 \end{cases}
 \]
-ここで、
-\begin{itemize}
-    \item \(f_1\)：デジタルデータが1の場合の周波数
-    \item \(f_0\)：デジタルデータが0の場合の周波数
-\end{itemize}
+ここで,
+\(A\) は信号の振幅, \(f_c\) はキャリア周波数, \(\Delta f\) は周波数偏移である.
 
-\subsection*{FSK復調の原理}
-FSK復調では、受信信号 \(s(t)\) から瞬時周波数を抽出し、デジタルデータを復元する。理論上は以下の操作を行う：
+この条件に基づいて変調信号は次の式で表される:
 \[
-d(t) = 
-\begin{cases} 
-1 & \text{瞬時周波数が} f_1 \text{に近い場合} \\
-0 & \text{瞬時周波数が} f_0 \text{に近い場合}
-\end{cases}
+v_{\text{FSK}}(t) = A \cos \left[ 2\pi f_c t + 2\pi \Delta f \int_{-\infty}^{t} m(\tau) d\tau \right].
 \]
+ここで \(m(t)\) は送信したいデジタルデータを表す. この変調プロセス全体の流れは, Figure\ref{fig:fsk_sender_block}に示すブロックダイアグラムに対応する.
 
-\subsection*{ブロックダイアグラムとの対応}
-以下に、FSK送受信機のブロックダイアグラムを示す。
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{./data1/day3/fsk_sender_block.png}
+    \caption{FSK送信機ブロックダイアグラム}
+    \label{fig:fsk_sender_block}
+\end{figure}
 
-\subsection*{送信機}
-\begin{itemize}
-    \item \textbf{Forループ内の配列のi番目の要素をそれぞれ複製する回数、nを決める}：
-    symbol rateは1000
-    \item \textbf{生成されたデータを周波数変調する}：
-    デジタルデータを用いて搬送波の周波数を変化させる。
-\end{itemize}
+Figure\ref{fig:fsk_sender_block}では, デジタルデータの各ビットに対応する周波数変化が, \(n\)（各ビットの時間）の繰り返し処理により実現される. \(n\) はIQレートをシンボルレートで割った値であり, 各ビットの持続時間を規定する. 図下部のforループはこの処理を実現している.
 
-\subsection*{受信機}
-\begin{itemize}
-    \item \textbf{周波数変調されたデータを復調して、波形グラフに表示する}：
-    デジタルデータなので、波形グラフのy軸を「0 or 1」になるようにする。
-    \item \textbf{「1」を表すものは6.28とかではなく1.0になるように}：
-    コンパレータで判定するのがベター。
-\end{itemize}
+さらに信号を積分をしたのちに, それに \(2\pi\Delta f\) を掛けることで最終的な周波数変調が施される.
+
+\subsection{FSK復調器の原理}
+FSK信号の復調器ではまずIQ信号から位相 \(\theta(t)\) を取り出し, これを微分して被変調信号\(2\pi \Delta f m(t)\)を得る. 
+
+微分後の信号から, 周波数偏移量 \(2\pi\Delta f\) を正規化し, コンパレータを用いて信号を「0」と「1」に判定する. Figure\ref{fig:fsk_receiver_block}はこの処理の流れを示したものである.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{./data1/day3/fsk_receiver_block.png}
+    \caption{FSK受信機ブロックダイアグラム}
+    \label{fig:fsk_receiver_block}
+\end{figure}
+
 
 \end{document}
