@@ -36,33 +36,59 @@
 \subsection{観測場所}
 観測は2号館12階の教室で実施した.
 
-\subsection{観測データの整理}
+\subsection{受信パラメータ}
+FMラジオ（Tokyo FM 80.0MHz）および地上デジタル（26ch, NHK-E, 548MHz-554MHz）の信号を以下の設定で受信した.
+
+\paragraph{FMラジオ (Tokyo FM 80.0MHz)}
 \begin{itemize}
-    \item 周波数: 80 MHz
-    \item 強度: -80 dBm
-    \item 観測されたスペクトラム:
-    \begin{itemize}
-        \item 1枚目の画像はFM信号である.
-        \item 2枚目の画像はNHK信号である.
-    \end{itemize}
+    \item デバイス名: 192.168.10.3 または 192.168.10.11
+    \item IQレート: 400kHz
+    \item キャリア周波数: 80MHz
+    \item アクティブアンテナ: RX2
+    \item サンプル数: 100,000
 \end{itemize}
 
-\subsection{観測スペクトラムの画像}
-以下に観測したスペクトラムのスクリーンキャプチャを示す.
+\paragraph{地上デジタル (26ch, NHK-E, 548MHz-554MHz)}
+\begin{itemize}
+    \item デバイス名: 192.168.10.3 または 192.168.10.11
+    \item IQレート: 10MHz
+    \item キャリア周波数: 551MHz
+    \item アクティブアンテナ: RX2
+    \item サンプル数: 200,000
+\end{itemize}
+
+\subsection{観測結果}
+観測されたスペクトラムのスクリーンキャプチャを以下に示す.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{data1/day1/FM.png}
-    \caption{片側カラム内の画像}
-    \label{fig:image1}
+    \caption{FMラジオのスペクトラム}
+    \label{fig:fm_spectrum}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\linewidth]{data1/day1/NHK.png}
-    \caption{NHK信号のスペクトラム}
+    \includegraphics[width=\linewidth]{data1/day1/NHK.png}
+    \caption{地上デジタル（NHK）のスペクトラム}
     \label{fig:nhk_spectrum}
 \end{figure}
+
+\subsection{考察}
+FMラジオの観測結果について, Figure \ref{fig:fm_spectrum} に示されるスペクトラムは, 受信したIQ信号をFFT処理した結果である. 観測周波数帯の中心周波数は80MHzであるが, スペクトルアナライザ上ではキャリア周波数がUSRPによって除去され, ベースバンド表示（中心周波数が0Hz）の形になっている. 従って, 図の中心を基準として, スペクトル全体を80MHzに平行移動すると実際の受信信号のスペクトルに対応する. ナイキスト周波数と標本化定理に基づき, 400kHzのIQレートでは片側200kHzまでの情報を正確に記録できる. この設定はFMラジオの帯域幅（約200kHz）を十分にカバーしている.
+
+一方, 地上デジタル（NHK）の観測結果について, Figure \ref{fig:nhk_spectrum} に示されるスペクトラムは548MHzから554MHzまでの信号をキャリア周波数551MHzを中心として受信したものである. 地上デジタル放送は6MHzの帯域幅を持つOFDM方式であり, Figure \ref{fig:nhk_spectrum} に見られるように全体的に平坦なスペクトル形状を示している. IQレート10MHzは, 地上デジタル放送の帯域幅6MHzをカバーするために必要な最低限のレート（ナイキスト周波数: 6MHz）を十分に満たしており, 受信データが損失なく取得できている.
+
+どちらの観測結果も, キャリア周波数が取り除かれているため, スペクトラムアナライザ上ではベースバンド信号として表示されている. また, Figure \ref{fig:fm_spectrum} では中心付近にピークが見られるが, これは受信信号の低周波成分が大きく寄与していることを示している. FMラジオの音声信号や地上デジタルの信号がキャリア周波数を中心に構成されることを考慮すると, スペクトラムアナライザ上の表示形状は妥当であると考えられる.
+
+\subsection{フーリエ変換の特性を用いた考察}
+実際に観測されている波形は, USRPによってキャリア周波数\(f_c\)が取り除かれた後の信号である. このため, スペクトルアナライザで表示される信号は, ベースバンド信号のスペクトルであり, その中心周波数は0Hzとして描かれている. フーリエ変換の周波数シフト性に基づくと, 観測スペクトルをキャリア周波数\(f_c\)だけ平行移動することで, 実際に受信した信号\(x(t)\)のスペクトルを正確に再現できる. フーリエ変換における周波数シフト性は次式で表される:
+
+\[
+\mathcal{F}\{x(t) e^{-j2\pi f_c t}\}(f) = X(f + f_c)
+\]
+
+これにより, 受信信号の特性を正確に分析可能である.
 
 
 \section*{課題2: FM送受信機の実装}
@@ -117,6 +143,53 @@ f_{\text{inst}}(t) = \frac{1}{2 \pi} \frac{d}{dt} \arg \left( s_{IQ}(t) \right)
 \subsection*{FMの音質が良い理由}
 FMでは振幅成分が一定で、ノイズが加わっても信号の周波数変化に影響を与えにくいため、AMより音質が良い。また、FMは広い帯域幅を利用できるため、高周波成分を含む信号を忠実に再現できる。
 
+\section*{課題3: FSK変復調器の実装}
 
+\subsection*{考察}
+FSK変復調器の原理を数式とブロックダイアグラムを用いて説明する。
+
+\subsection*{FSK変調の原理}
+FSK変調は、デジタルデータを用いて搬送波の周波数を変化させる方式である。送信信号は以下で表される：
+\[
+s(t) = 
+\begin{cases} 
+A \cos \left( 2 \pi f_1 t \right) & \text{デジタルデータが1の場合} \\
+A \cos \left( 2 \pi f_0 t \right) & \text{デジタルデータが0の場合}
+\end{cases}
+\]
+ここで、
+\begin{itemize}
+    \item \(f_1\)：デジタルデータが1の場合の周波数
+    \item \(f_0\)：デジタルデータが0の場合の周波数
+\end{itemize}
+
+\subsection*{FSK復調の原理}
+FSK復調では、受信信号 \(s(t)\) から瞬時周波数を抽出し、デジタルデータを復元する。理論上は以下の操作を行う：
+\[
+d(t) = 
+\begin{cases} 
+1 & \text{瞬時周波数が} f_1 \text{に近い場合} \\
+0 & \text{瞬時周波数が} f_0 \text{に近い場合}
+\end{cases}
+\]
+
+\subsection*{ブロックダイアグラムとの対応}
+以下に、FSK送受信機のブロックダイアグラムを示す。
+
+\subsection*{送信機}
+\begin{itemize}
+    \item \textbf{Forループ内の配列のi番目の要素をそれぞれ複製する回数、nを決める}：
+    symbol rateは1000
+    \item \textbf{生成されたデータを周波数変調する}：
+    デジタルデータを用いて搬送波の周波数を変化させる。
+\end{itemize}
+
+\subsection*{受信機}
+\begin{itemize}
+    \item \textbf{周波数変調されたデータを復調して、波形グラフに表示する}：
+    デジタルデータなので、波形グラフのy軸を「0 or 1」になるようにする。
+    \item \textbf{「1」を表すものは6.28とかではなく1.0になるように}：
+    コンパレータで判定するのがベター。
+\end{itemize}
 
 \end{document}
